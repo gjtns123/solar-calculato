@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d47a1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="태양광계산기">
+<link rel="manifest" href="manifest.json">
+<title>태양광 종합 계산기 v2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:#1a73e8;--pl:#e8f0fe;--bg:#f5f7fa;--c:#fff;--t:#202124;--tl:#5f6368;--bd:#dadce0;--ok:#0d904f;--okl:#e6f4ea;--wn:#f9ab00;--wnl:#fef7e0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--t);line-height:1.6;padding:16px 16px 90px;-webkit-tap-highlight-color:transparent}
+.ct{max-width:900px;margin:0 auto}
+header{text-align:center;padding:24px 16px;background:linear-gradient(135deg,#1a73e8,#0d47a1);border-radius:16px;color:#fff;margin-bottom:16px}
+header h1{font-size:21px;font-weight:800}
+header p{font-size:11px;opacity:.8;margin-top:4px}
+.badge{display:inline-block;background:rgba(255,255,255,.2);padding:2px 10px;border-radius:20px;font-size:10px;margin-top:6px}
+.card{background:var(--c);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--bd)}
+.ct-t{font-size:15px;font-weight:700;color:var(--p);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--pl)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.fg,.rg,.sb{grid-template-columns:1fr!important}}
+.fi{display:flex;flex-direction:column;gap:4px}
+label{font-size:11px;font-weight:600;color:var(--tl)}
+select,input[type=number]{padding:10px;border:1px solid var(--bd);border-radius:8px;font-size:14px;background:#fafafa;width:100%;-webkit-appearance:none}
+select:focus,input:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px rgba(26,115,232,.12);background:#fff}
+.ht{font-size:10px;color:var(--tl);margin-top:1px}
+.tr{display:flex;gap:5px;flex-wrap:wrap}
+.tb{flex:1;min-width:60px;padding:9px 4px;border:2px solid var(--bd);border-radius:8px;background:#fff;font-size:11px;font-weight:600;color:var(--tl);cursor:pointer;text-align:center;transition:all .15s}
+.tb.a{border-color:var(--p);background:var(--pl);color:var(--p)}
+.btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:10px}
+.btn:active{transform:scale(.97)}
+#results{display:none}
+.sb{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
+.si{text-align:center;padding:14px 6px;border-radius:12px;background:linear-gradient(135deg,#1a73e8,#1565c0);color:#fff}
+.si .sl{font-size:10px;opacity:.85;margin-bottom:2px}
+.si .sv{font-size:18px;font-weight:800;word-break:keep-all}
+.si .su{font-size:10px;opacity:.75}
+.si.g{background:linear-gradient(135deg,#0d904f,#1b5e20)}
+.si.o{background:linear-gradient(135deg,#e65100,#bf360c)}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ri{background:var(--bg);border-radius:10px;padding:12px;border:1px solid var(--bd)}
+.ri .lb{font-size:10px;color:var(--tl);margin-bottom:2px}
+.ri .vl{font-size:17px;font-weight:700}
+.ri .ut{font-size:10px;font-weight:400;color:var(--tl)}
+.ri.hi{background:var(--okl);border-color:var(--ok)}.ri.hi .vl{color:var(--ok)}
+.ri.wa{background:var(--wnl);border-color:var(--wn)}.ri.wa .vl{color:#e65100}
+.ri.ac{background:var(--pl);border-color:var(--p)}.ri.ac .vl{color:var(--p)}
+.note{font-size:10px;color:var(--tl);margin-top:12px;padding:9px;background:#f8f9fa;border-radius:8px;border-left:3px solid var(--p);line-height:1.5}
+footer{text-align:center;padding:14px;font-size:10px;color:var(--tl)}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);display:flex;z-index:100;padding:4px 0 env(safe-area-inset-bottom)}
+.tab{flex:1;text-align:center;padding:6px 2px;font-size:10px;color:var(--tl);cursor:pointer}
+.tab.on{color:var(--p);font-weight:700}
+.tab i{font-size:18px;display:block;margin-bottom:1px;font-style:normal}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+th,td{padding:7px 6px;border:1px solid var(--bd);text-align:center}
+th{background:var(--pl);font-weight:600}
+td:first-child{text-align:left}
+</style>
+</head>
+<body>
+<div class="ct">
+<header>
+  <h1>☀️ 태양광 종합 계산기</h1>
+  <p>설치비 · 보조금 · 임대수익 · 전력판매 · 전기요금 절감</p>
+  <div class="badge">📴 오프라인 사용 가능 · 2026년 기준</div>
+</header>
+
+<!-- ===== 계산기 페이지 ===== -->
+<div id="pg1">
+<div class="card">
+  <div class="ct-t">⚙️ 설치 조건 입력</div>
+  <div class="fg">
+
+    <div class="fi">
+      <label>설치 유형</label>
+      <div class="tr" id="g1">
+        <button class="tb a" data-v="roof" onclick="T('g1',this)">🏢 옥상형</button>
+        <button class="tb" data-v="park" onclick="T('g1',this)">🅿️ 주차장</button>
+        <button class="tb" data-v="farm" onclick="T('g1',this)">🌾 농지</button>
+        <button class="tb" data-v="land" onclick="T('g1',this)">📐 일반</button>
+      </div>
+    </div>
+
+    <div class="fi">
+      <label>사업 유형</label>
+      <select id="biz" onchange="UD()">
+        <option value="bld" selected>건물지원</option>
+        <option value="rent">부지임대</option>
+        <option value="apt">공동주택</option>
+        <option value="sun">햇빛소득마을</option>
+      </select>
+    </div>
+
+    <div class="fi">
+      <label>설치 용량 (kW)</label>
+      <input type="number" id="cap" value="100" min="1" max="9999">
+      <div class="ht" id="capH">건물지원: 50~1,000kW</div>
+    </div>
+
+    <div class="fi">
+      <label>수익 모델</label>
+      <div class="tr" id="g2">
+        <button class="tb a" data-v="self" onclick="T('g2',this)">⚡ 자가소비</button>
+        <button class="tb" data-v="lease" onclick="T('g2',this)">🤝 임대</button>
+        <button class="tb" data-v="sell" onclick="T('g2',this)">💡 전력판매</button>
+      </div>
+    </div>
+
+    <div class="fi">
+      <label>지자체 보조금 (%)</label>
+      <input type="number" id="lsub" value="20" min="0" max="50">
+      <div class="ht">양평 21.8%, 대구 22%, 없으면 0</div>
+    </div>
+
+    <div class="fi">
+      <label>kW당 연 임대료 (원)</label>
+      <input type="number" id="lrate" value="35000" min="0" max="80000" step="1000">
+      <div class="ht">시장 평균 25,000~40,000원</div>
+    </div>
+
+    <div class="fi">
+      <label>연간 발전시간 (h)</label>
+      <input type="number" id="sunH" value="1314" min="800" max="1800">
+      <div class="ht">전국 평균 1,314h (일 3.6h)</div>
+    </div>
+
+    <div class="fi">
+      <label>전기요금 단가 (원/kWh)</label>
+      <input type="number" id="elP" value="150" min="50" max="500">
+      <div class="ht">산업 120, 주택 150, 상업 170</div>
+    </div>
+
+    <div class="fi">
+      <label>SMP 단가 (원/kWh)</label>
+      <input type="number" id="smp" value="110" min="50" max="300">
+      <div class="ht">2025년 평균 약 100~120원</div>
+    </div>
+
+    <div class="fi">
+      <label>REC 단가 (원/kWh)</label>
+      <input type="number" id="rec" value="70" min="20" max="200">
+      <div class="ht">2025년 평균 약 60~80원</div>
+    </div>
+
+  </div>
+  <button class="btn" onclick="CALC()">📊 계산하기</button>
+</div>
+
+<!-- ===== 결과 ===== -->
+<div id="results">
+
+  <div class="card">
+    <div class="ct-t">📋 결과 요약</div>
+    <div class="sb">
+      <div class="si"><div class="sl">총 설치비</div><div class="sv" id="s1">-</div><div class="su" id="s1u"></div></div>
+      <div class="si g"><div class="sl">실제 자부담</div><div class="sv" id="s2">-</div><div class="su" id="s2u"></div></div>
+      <div class="si o"><div class="sl" id="s3l">핵심지표</div><div class="sv" id="s3">-</div><div class="su" id="s3u"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct-t">💰 비용 분석</div>
+    <div class="rg">
+      <div class="ri"><div class="lb">kW당 단가</div><div class="vl" id="c1"></div></div>
+      <div class="ri"><div class="lb">총 설치비</div><div class="vl" id="c2"></div></div>
+      <div class="ri ac"><div class="lb">국비 보조금</div><div class="vl" id="c3"></div></div>
+      <div class="ri ac"><div class="lb">지자체 보조금</div><div class="vl" id="c4"></div></div>
+      <div class="ri hi"><div class="lb">보조금 합계</div><div class="vl" id="c5"></div></div>
+      <div class="ri wa"><div class="lb">자부담금</div><div class="vl" id="c6"></div></div>
+    </div>
+  </div>
+
+  <!-- 자가소비 -->
+  <div class="card" id="selfR" style="display:none">
+    <div class="ct-t">⚡ 자가소비 수익 분석</div>
+    <div class="rg">
+      <div class="ri"><div class="lb">연간 발전량</div><div class="vl" id="a1"></div></div>
+      <div class="ri hi"><div class="lb">연간 전기요금 절감</div><div class="vl" id="a2"></div></div>
+      <div class="ri"><div class="lb">월평균 절감</div><div class="vl" id="a3"></div></div>
+      <div class="ri wa"><div class="lb">투자 회수 기간</div><div class="vl" id="a4"></div></div>
+      <div class="ri hi"><div class="lb">20년 절감 합계</div><div class="vl" id="a5"></div></div>
+      <div class="ri hi"><div class="lb">20년 순이익</div><div class="vl" id="a6"></div></div>
+    </div>
+  </div>
+
+  <!-- 전력판매 -->
+  <div class="card" id="sellR" style="display:none">
+    <div class="ct-t">💡 전력판매(SMP+REC) 수익 분석</div>
+    <div class="rg">
+      <div class="ri"><div class="lb">연간 발전량</div><div class="vl" id="p1"></div></div>
+      <div class="ri"><div class="lb">SMP 수익 (연)</div><div class="vl" id="p2"></div></div>
+      <div class="ri"><div class="lb">REC 수익 (연)</div><div class="vl" id="p3"></div></div>
+      <div class="ri hi"><div class="lb">연간 총 매출</div><div class="vl" id="p4"></div></div>
+      <div class="ri"><div class="lb">월평균 매출</div><div class="vl" id="p5"></div></div>
+      <div class="ri wa"><div class="lb">투자 회수 기간</div><div class="vl" id="p6"></div></div>
+      <div class="ri hi"><div class="lb">20년 총 매출</div><div class="vl" id="p7"></div></div>
+      <div class="ri hi"><div class="lb">20년 순이익</div><div class="vl" id="p8"></div></div>
+    </div>
+    <div class="note">※ REC 가중치: 옥상형 1.5, 주차장 1.5, 농지(영농형) 1.2, 일반(토지) 1.0 적용. 실제 가중치는 용량·설치조건에 따라 달라질 수 있습니다.</div>
+  </div>
+
+  <!-- 임대 -->
+  <div class="card" id="leaseR" style="display:none">
+    <div class="ct-t">🤝 부지/지붕 임대 수익 분석</div>
+    <div class="rg">
+      <div class="ri hi"><div class="lb">연간 임대수익</div><div class="vl" id="l1"></div></div>
+      <div class="ri"><div class="lb">월평균 임대수익</div><div class="vl" id="l2"></div></div>
+      <div class="ri hi"><div class="lb">20년 총 수익</div><div class="vl" id="l3"></div></div>
+      <div class="ri"><div class="lb">5년 선납 수령액</div><div class="vl" id="l4"></div></div>
+    </div>
+    <div class="note">※ 임대 모델: 건물주 초기투자 0원. 발전사업자가 전액 투자하고 부지만 제공합니다.</div>
+  </div>
+
+  <!-- 햇빛소득마을 -->
+  <div class="card" id="svR" style="display:none">
+    <div class="ct-t">🏘️ 햇빛소득마을 재원 구조</div>
+    <div class="rg">
+      <div class="ri"><div class="lb">총 설치비</div><div class="vl" id="v1"></div></div>
+      <div class="ri ac"><div class="lb">정책융자 85%</div><div class="vl" id="v2"></div></div>
+      <div class="ri wa"><div class="lb">주민자부담 15%</div><div class="vl" id="v3"></div></div>
+      <div class="ri"><div class="lb">월 상환액 (거치후)</div><div class="vl" id="v4"></div></div>
+      <div class="ri hi"><div class="lb">연간 매출 (SMP+REC)</div><div class="vl" id="v5"></div></div>
+      <div class="ri hi"><div class="lb">연 순수익 (상환후)</div><div class="vl" id="v6"></div></div>
+    </div>
+    <div class="note">※ 정책융자: 연 1.75%, 5년 거치 10년 분할상환. REC 가중치 적용된 SMP+REC 합산.</div>
+  </div>
+
+  <div class="note">※ 본 계산기는 2026년 정부 지원사업 공고 기준 <b>참고용 추정치</b>입니다. 실제 금액은 현장 조건에 따라 달라집니다.</div>
+</div>
+</div>
+
+<!-- ===== 단가표 페이지 ===== -->
+<div id="pg2" style="display:none">
+  <div class="card">
+    <div class="ct-t">📖 설치 유형별 kW당 단가 (만원)</div>
+    <table>
+      <tr><th>구분</th><th>옥상형</th><th>주차장</th><th>농지</th><th>일반</th></tr>
+      <tr><td>~50kW</td><td>140</td><td>220</td><td>135</td><td>120</td></tr>
+      <tr><td>50~200kW</td><td>125</td><td>195</td><td>120</td><td>110</td></tr>
+      <tr><td>200~500kW</td><td>115</td><td>175</td><td>112</td><td>105</td></tr>
+      <tr><td>500kW+</td><td>105</td><td>160</td><td>105</td><td>100</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="ct-t">💵 국비 보조금 단가</div>
+    <table>
+      <tr><th>사업유형</th><th>kW당</th><th>비고</th></tr>
+      <tr><td>건물지원</td><td>52.5만</td><td>축사 57.1만</td></tr>
+      <tr><td>부지임대</td><td>-</td><td>건물주 투자 없음</td></tr>
+      <tr><td>공동주택</td><td>~55만</td><td>설비가격의 ~50%</td></tr>
+      <tr><td>햇빛소득마을</td><td>-</td><td>85% 정책융자</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="ct-t">🤝 임대료 시세 (kW당/연)</div>
+    <table>
+      <tr><th>구분</th><th>임대료</th></tr>
+      <tr><td>공유재산(지자체)</td><td>2.5만원</td></tr>
+      <tr><td>민간 일반</td><td>3.0~3.5만원</td></tr>
+      <tr><td>민간 프리미엄</td><td>4.0만원</td></tr>
+      <tr><td>5년 선납</td><td>3.5만원</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="ct-t">⚡ REC 가중치</div>
+    <table>
+      <tr><th>설치유형</th><th>가중치</th></tr>
+      <tr><td>옥상형 (건물 지붕)</td><td>1.5</td></tr>
+      <tr><td>주차장 (캐노피)</td><td>1.5</td></tr>
+      <tr><td>농지 (영농형)</td><td>1.2</td></tr>
+      <tr><td>일반 (토지)</td><td>1.0</td></tr>
+    </table>
+  </div>
+</div>
+
+<footer>태양광 종합 계산기 v2.0 · 2026년 4월 기준</footer>
+</div>
+
+<!-- 하단 탭바 -->
+<div class="tab-bar">
+  <div class="tab on" onclick="PG(1,this)"><i>🔢</i>계산기</div>
+  <div class="tab" onclick="PG(2,this)"><i>📊</i>단가표</div>
+</div>
+
+<script>
+/* 토글 */
+function T(g,b){document.getElementById(g).querySelectorAll('.tb').forEach(x=>x.classList.remove('a'));b.classList.add('a')}
+function GV(g){const a=document.getElementById(g).querySelector('.tb.a');return a?a.dataset.v:''}
+
+/* 페이지 전환 */
+function PG(n,el){
+  document.getElementById('pg1').style.display=n===1?'block':'none';
+  document.getElementById('pg2').style.display=n===2?'block':'none';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* 기본값 */
+function UD(){
+  const b=document.getElementById('biz').value,c=document.getElementById('cap'),h=document.getElementById('capH');
+  if(b==='bld'){c.value=100;h.textContent='건물지원: 50~1,000kW'}
+  else if(b==='rent'){c.value=300;h.textContent='부지임대: 100~1,000kW'}
+  else if(b==='apt'){c.value=50;h.textContent='공동주택: 10~200kW'}
+  else{c.value=500;h.textContent='햇빛소득마을: 300~1,000kW'}
+}
+
+/* 금액 포맷: 1억 이상이면 "X억 X,XXX만원" */
+function W(man){
+  if(man<0) return '-'+W(-man);
+  const rounded=Math.round(man);
+  if(rounded>=10000){
+    const eok=Math.floor(rounded/10000);
+    const rest=rounded%10000;
+    if(rest===0) return eok.toLocaleString()+'억';
+    return eok.toLocaleString()+'억 '+rest.toLocaleString()+'만';
+  }
+  return rounded.toLocaleString()+'만';
+}
+function WW(man){return W(man)+'원'}
+
+/* kW당 단가 (만원) */
+function UC(type,biz,cap){
+  // 옥상형
+  if(type==='roof'){
+    if(biz==='apt') return 148;
+    if(cap<=50) return 140; if(cap<=200) return 125; if(cap<=500) return 115; return 105;
+  }
+  // 주차장
+  if(type==='park'){
+    if(biz==='apt') return 210;
+    if(cap<=50) return 220; if(cap<=200) return 195; if(cap<=500) return 175; return 160;
+  }
+  // 농지(영농형)
+  if(type==='farm'){
+    if(cap<=50) return 135; if(cap<=200) return 120; if(cap<=500) return 112; return 105;
+  }
+  // 일반(토지)
+  if(cap<=50) return 120; if(cap<=200) return 110; if(cap<=500) return 105; return 100;
+}
+
+/* 국비보조금 kW당 (만원) */
+function GS(biz){
+  if(biz==='bld') return 52.5;
+  if(biz==='apt') return 55;
+  return 0; // rent, sun
+}
+
+/* REC 가중치 */
+function RW(type){
+  if(type==='roof'||type==='park') return 1.5;
+  if(type==='farm') return 1.2;
+  return 1.0;
+}
+
+/* ===== 메인 계산 ===== */
+function CALC(){
+  const type=GV('g1'), biz=document.getElementById('biz').value, model=GV('g2');
+  const cap=parseFloat(document.getElementById('cap').value)||0;
+  if(cap<=0){alert('용량을 입력하세요.');return}
+  const lsubP=parseFloat(document.getElementById('lsub').value)||0;
+  const lrate=parseFloat(document.getElementById('lrate').value)||35000;
+  const sunH=parseFloat(document.getElementById('sunH').value)||1314;
+  const elP=parseFloat(document.getElementById('elP').value)||150;
+  const smpP=parseFloat(document.getElementById('smp').value)||110;
+  const recP=parseFloat(document.getElementById('rec').value)||70;
+
+  // 단가·비용
+  const u=UC(type,biz,cap);
+  const tc=u*cap; // 총설치비 (만원)
+  const gsk=GS(biz); const gsv=gsk*cap;
+  const lsv=tc*(lsubP/100);
+  const tsv=gsv+lsv;
+  const sp=Math.max(tc-tsv,0);
+
+  // 발전량
+  const gen=cap*sunH; // kWh/년
+  const rw=RW(type);
+
+  // 자가소비 수익
+  const selfY=gen*elP/10000; // 만원/년
+  const selfM=selfY/12;
+  const selfPB=selfY>0?sp/selfY:999;
+  const self20=selfY*20;
+  const selfNet=self20-sp;
+
+  // 전력판매 수익
+  const smpY=gen*smpP/10000;
+  const recY=gen*recP*rw/10000;
+  const sellY=smpY+recY;
+  const sellM=sellY/12;
+  const sellPB=sellY>0?sp/sellY:999;
+  const sell20=sellY*20;
+  const sellNet=sell20-sp;
+
+  // 임대수익
+  const leaseY=cap*lrate/10000;
+  const leaseM=leaseY/12;
+  const lease20=leaseY*20;
+  const prepay5=cap*35000*5/10000;
+
+  // 햇빛소득마을
+  const svLoan=tc*0.85;
+  const svSelf=tc*0.15;
+  const mr=0.0175/12, nm=120;
+  const svMpay=svLoan*10000*mr*Math.pow(1+mr,nm)/(Math.pow(1+mr,nm)-1)/10000;
+  const svAnnualPay=svMpay*12;
+  const svRev=sellY; // SMP+REC
+  const svNet=svRev-svAnnualPay;
+
+  // ===== 화면 표시 =====
+  document.getElementById('results').style.display='block';
+
+  // 요약
+  document.getElementById('s1').textContent=W(tc);
+  document.getElementById('s1u').textContent='';
+
+  if(model==='lease'){
+    document.getElementById('s2').textContent='0 (무투자)';
+    document.getElementById('s3l').textContent='연간 임대수익';
+    document.getElementById('s3').textContent=W(leaseY);
+    document.getElementById('s3u').textContent='/년';
+  } else if(biz==='sun'){
+    document.getElementById('s2').textContent=WW(svSelf);
+    document.getElementById('s2u').textContent='(15%)';
+    document.getElementById('s3l').textContent='연 순수익';
+    document.getElementById('s3').textContent=WW(svNet);
+    document.getElementById('s3u').textContent='/년';
+  } else {
+    document.getElementById('s2').textContent=WW(sp);
+    document.getElementById('s2u').textContent='';
+    const mainY=model==='sell'?sellY:selfY;
+    const mainPB=model==='sell'?sellPB:selfPB;
+    document.getElementById('s3l').textContent='투자 회수';
+    document.getElementById('s3').textContent=mainPB<99?mainPB.toFixed(1)+'년':'-';
+    document.getElementById('s3u').textContent='';
+  }
+
+  // 비용분석
+  document.getElementById('c1').innerHTML=u+'<span class="ut"> 만원/kW</span>';
+  document.getElementById('c2').innerHTML=WW(tc);
+  document.getElementById('c3').innerHTML=WW(gsv)+' <span class="ut">('+gsk+'만/kW)</span>';
+  document.getElementById('c4').innerHTML=WW(lsv)+' <span class="ut">('+lsubP+'%)</span>';
+  document.getElementById('c5').innerHTML=WW(tsv)+' <span class="ut">('+((tsv/tc*100)||0).toFixed(1)+'%)</span>';
+  document.getElementById('c6').innerHTML=WW(sp)+' <span class="ut">('+((sp/tc*100)||0).toFixed(1)+'%)</span>';
+
+  // 모든 수익패널 숨기기
+  ['selfR','sellR','leaseR','svR'].forEach(id=>document.getElementById(id).style.display='none');
+
+  if(model==='self'){
+    document.getElementById('selfR').style.display='block';
+    document.getElementById('a1').innerHTML=gen.toLocaleString()+'<span class="ut"> kWh</span>';
+    document.getElementById('a2').innerHTML=WW(selfY);
+    document.getElementById('a3').innerHTML=WW(selfM);
+    document.getElementById('a4').innerHTML=(selfPB<99?selfPB.toFixed(1)+'년':'-');
+    document.getElementById('a5').innerHTML=WW(self20);
+    document.getElementById('a6').innerHTML=WW(selfNet);
+  }
+
+  if(model==='sell'){
+    document.getElementById('sellR').style.display='block';
+    document.getElementById('p1').innerHTML=gen.toLocaleString()+'<span class="ut"> kWh</span>';
+    document.getElementById('p2').innerHTML=WW(smpY);
+    document.getElementById('p3').innerHTML=WW(recY)+' <span class="ut">(가중치 '+rw+')</span>';
+    document.getElementById('p4').innerHTML=WW(sellY);
+    document.getElementById('p5').innerHTML=WW(sellM);
+    document.getElementById('p6').innerHTML=(sellPB<99?sellPB.toFixed(1)+'년':'-');
+    document.getElementById('p7').innerHTML=WW(sell20);
+    document.getElementById('p8').innerHTML=WW(sellNet);
+  }
+
+  if(model==='lease'){
+    document.getElementById('leaseR').style.display='block';
+    document.getElementById('l1').innerHTML=WW(leaseY);
+    document.getElementById('l2').innerHTML=WW(leaseM);
+    document.getElementById('l3').innerHTML=WW(lease20);
+    document.getElementById('l4').innerHTML=WW(prepay5);
+  }
+
+  if(biz==='sun'){
+    document.getElementById('svR').style.display='block';
+    document.getElementById('v1').innerHTML=WW(tc);
+    document.getElementById('v2').innerHTML=WW(svLoan);
+    document.getElementById('v3').innerHTML=WW(svSelf);
+    document.getElementById('v4').innerHTML=WW(svMpay);
+    document.getElementById('v5').innerHTML=WW(svRev);
+    document.getElementById('v6').innerHTML=WW(svNet);
+  }
+
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+// SW 등록
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+</script>
+</body>
+</html>
