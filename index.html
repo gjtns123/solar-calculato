@@ -238,10 +238,10 @@ td:first-child{text-align:left}
     <div class="ct-t">📖 설치 유형별 kW당 단가 (만원)</div>
     <table>
       <tr><th>구분</th><th>옥상형</th><th>주차장</th><th>농지</th><th>저수지(수상)</th></tr>
-      <tr><td>~50kW</td><td>140</td><td>220</td><td>135</td><td>140</td></tr>
-      <tr><td>50~200kW</td><td>125</td><td>195</td><td>120</td><td>140</td></tr>
-      <tr><td>200~500kW</td><td>115</td><td>175</td><td>112</td><td>140</td></tr>
-      <tr><td>500kW+</td><td>105</td><td>160</td><td>105</td><td>140</td></tr>
+      <tr><td>~50kW</td><td>150</td><td>220</td><td>160</td><td>160</td></tr>
+      <tr><td>50~200kW</td><td>145</td><td>195</td><td>160</td><td>160</td></tr>
+      <tr><td>200~500kW</td><td>145</td><td>175</td><td>160</td><td>160</td></tr>
+      <tr><td>500kW+</td><td>140</td><td>160</td><td>160</td><td>160</td></tr>
     </table>
   </div>
   <div class="card">
@@ -271,7 +271,7 @@ td:first-child{text-align:left}
       <tr><td>옥상형 (건물 지붕)</td><td>1.5</td></tr>
       <tr><td>주차장 (캐노피)</td><td>1.5</td></tr>
       <tr><td>농지 (영농형)</td><td>1.2</td></tr>
-      <tr><td>저수지(수상)</td><td>1.0</td></tr>
+      <tr><td>저수지(수상)</td><td>1.6</td></tr>
     </table>
   </div>
 </div>
@@ -326,19 +326,19 @@ function UC(type,biz,cap){
   // 옥상형
   if(type==='roof'){
     if(biz==='apt') return 148;
-    if(cap<=50) return 140; if(cap<=200) return 125; if(cap<=500) return 115; return 105;
+    if(cap<=50) return 140; if(cap<=200) return 140; if(cap<=500) return 140; return 140;
   }
   // 주차장
   if(type==='park'){
     if(biz==='apt') return 210;
-    if(cap<=50) return 220; if(cap<=200) return 195; if(cap<=500) return 175; return 160;
+    if(cap<=50) return 220; if(cap<=200) return 190; if(cap<=500) return 180; return 180;
   }
   // 농지(영농형)
   if(type==='farm'){
-    if(cap<=50) return 135; if(cap<=200) return 120; if(cap<=500) return 112; return 105;
+    if(cap<=50) return 140; if(cap<=200) return 140; if(cap<=500) return 140; return 140;
   }
-  // 일반(토지)
-  if(cap<=50) return 120; if(cap<=200) return 110; if(cap<=500) return 105; return 100;
+  // 저수지(수상)
+  if(cap<=50) return 160; if(cap<=200) return 160; if(cap<=500) return 160; return 160;
 }
 
 /* 국비보조금 kW당 (만원) */
